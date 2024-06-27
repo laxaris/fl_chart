@@ -686,20 +686,15 @@ enum TooltipDirection {
 }
 
 /// Holds representation data for showing tooltip popup on top of rods.
+typedef GetBarTooltipItemWidget = Widget Function(
+  BuildContext context,
+  BarChartGroupData group,
+  int groupIndex,
+  BarChartRodData rod,
+  int rodIndex,
+);
+
 class BarTouchTooltipData with EquatableMixin {
-  /// if [BarTouchData.handleBuiltInTouches] is true,
-  /// [BarChart] shows a tooltip popup on top of rods automatically when touch happens,
-  /// otherwise you can show it manually using [BarChartGroupData.showingTooltipIndicators].
-  /// Tooltip shows on top of rods, with [getTooltipColor] as a background color,
-  /// and you can set corner radius using [tooltipRoundedRadius].
-  /// If you want to have a padding inside the tooltip, fill [tooltipPadding],
-  /// or If you want to have a bottom margin, set [tooltipMargin].
-  /// Content of the tooltip will provide using [getTooltipItem] callback, you can override it
-  /// and pass your custom data to show in the tooltip.
-  /// You can restrict the tooltip's width using [maxContentWidth].
-  /// Sometimes, [BarChart] shows the tooltip outside of the chart,
-  /// you can set [fitInsideHorizontally] true to force it to shift inside the chart horizontally,
-  /// also you can set [fitInsideVertically] true to force it to shift inside the chart vertically.
   BarTouchTooltipData({
     double? tooltipRoundedRadius,
     EdgeInsets? tooltipPadding,
@@ -714,6 +709,7 @@ class BarTouchTooltipData with EquatableMixin {
     TooltipDirection? direction,
     double? rotateAngle,
     BorderSide? tooltipBorder,
+    GetBarTooltipItemWidget? getTooltipItemWidget,
   })  : tooltipRoundedRadius = tooltipRoundedRadius ?? 4,
         tooltipPadding = tooltipPadding ??
             const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -729,48 +725,23 @@ class BarTouchTooltipData with EquatableMixin {
         direction = direction ?? TooltipDirection.auto,
         rotateAngle = rotateAngle ?? 0.0,
         tooltipBorder = tooltipBorder ?? BorderSide.none,
-        super();
+        getTooltipItemWidget = getTooltipItemWidget;
 
-  /// Sets a rounded radius for the tooltip.
   final double tooltipRoundedRadius;
-
-  /// Applies a padding for showing contents inside the tooltip.
   final EdgeInsets tooltipPadding;
-
-  /// Applies a bottom margin for showing tooltip on top of rods.
   final double tooltipMargin;
-
-  /// Controls showing tooltip on left side, right side or center aligned with rod, default is center
   final FLHorizontalAlignment tooltipHorizontalAlignment;
-
-  /// Applies horizontal offset for showing tooltip, default is zero.
   final double tooltipHorizontalOffset;
-
-  /// Restricts the tooltip's width.
   final double maxContentWidth;
-
-  /// Retrieves data for showing content inside the tooltip.
   final GetBarTooltipItem getTooltipItem;
-
-  /// Forces the tooltip to shift horizontally inside the chart, if overflow happens.
-  final bool fitInsideHorizontally;
-
-  /// Forces the tooltip to shift vertically inside the chart, if overflow happens.
-  final bool fitInsideVertically;
-
-  /// Controls showing tooltip on top or bottom, default is auto.
-  final TooltipDirection direction;
-
-  /// Controls the rotation of the tooltip.
-  final double rotateAngle;
-
-  /// The tooltip border color.
-  final BorderSide tooltipBorder;
-
-  /// Retrieves data for setting background color of the tooltip.
   final GetBarTooltipColor getTooltipColor;
+  final bool fitInsideHorizontally;
+  final bool fitInsideVertically;
+  final TooltipDirection direction;
+  final double rotateAngle;
+  final BorderSide tooltipBorder;
+  final GetBarTooltipItemWidget? getTooltipItemWidget;
 
-  /// Used for equality check, see [EquatableMixin].
   @override
   List<Object?> get props => [
         tooltipRoundedRadius,
@@ -780,11 +751,13 @@ class BarTouchTooltipData with EquatableMixin {
         tooltipHorizontalOffset,
         maxContentWidth,
         getTooltipItem,
+        getTooltipColor,
         fitInsideHorizontally,
         fitInsideVertically,
+        direction,
         rotateAngle,
         tooltipBorder,
-        getTooltipColor,
+        getTooltipItemWidget,
       ];
 }
 
